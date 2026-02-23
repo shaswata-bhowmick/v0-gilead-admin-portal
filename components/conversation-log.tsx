@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Trash2, MessageSquare, Clock, Globe, Eye, Code, MessageCircle } from 'lucide-react'
+import { Trash2, MessageSquare, Clock, Globe, Eye, Code, MessageCircle, User, Mail } from 'lucide-react'
 
 interface Conversation {
   id: string
@@ -16,6 +16,9 @@ interface Conversation {
   focus: string
   jsonData: any
   flowContent: string
+  hcpId?: string
+  hcpName?: string
+  source: string
 }
 
 const MOCK_CONVERSATIONS: Conversation[] = [
@@ -27,6 +30,9 @@ const MOCK_CONVERSATIONS: Conversation[] = [
     duration: '12m 34s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    hcpId: 'HCP-001',
+    hcpName: 'Dr. Sarah Johnson',
+    source: 'Oncomyra Now Approved Campaign Email',
     flowContent: `🔹 Conversation Log – Version 1 (Cardiovexra Focus)
 👤 User
 
@@ -227,6 +233,9 @@ Confirmation email sent to user.`,
     duration: '14m 22s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-001',
+    hcpName: 'Dr. Sarah Johnson',
+    source: 'Cardiovexra Doc Locator Email',
     flowContent: `🔹 Conversation Log – Version 2 (Oncomyra Focus)
 👤 User
 
@@ -392,6 +401,9 @@ Ticket ID: CAR-2024-1183`,
     duration: '16m 45s',
     url: 'agent.pharma.com/portfolio',
     focus: 'Mixed Portfolio',
+    hcpId: 'HCP-002',
+    hcpName: 'Dr. Michael Chen',
+    source: 'Oncomyra Welcome Email',
     flowContent: `🔹 Conversation Log – Version 3 (Mixed Portfolio)
 👤 User
 
@@ -553,6 +565,7 @@ Ticket ID: CAR-2024-1211`,
     duration: '9m 12s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    source: 'Cardiovexra Welcome Email',
     flowContent: `👤 User\n\nWhat are the contraindications for Cardiovexra?\n\n🤖 Info Agent\n\nCardiovexra is contraindicated in patients with known hypersensitivity to the active ingredient or any excipients. It should not be used in patients with severe hepatic impairment (Child-Pugh Class C) or during pregnancy.\n\nDocuments Shared:\n- Cardiovexra Prescribing Information (Section 4)\n- Safety Profile Summary`,
     jsonData: {
       "conversation_id": "CONV-004",
@@ -571,6 +584,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '7m 33s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-003',
+    hcpName: 'Dr. Emily Rodriguez',
+    source: 'Oncomyra Doc Locator Email',
     flowContent: `👤 User\n\nWhat are common side effects of Oncomyra?\n\n🤖 Info Agent\n\nThe most common adverse reactions (≥20%) include hyperphosphatemia, dry mouth, nail toxicity, fatigue, constipation, and stomatitis. Most are manageable with dose modifications and supportive care.\n\nDocuments Shared:\n- Oncomyra Safety Profile\n- Adverse Event Management Guide`,
     jsonData: {
       "conversation_id": "CONV-005",
@@ -589,6 +605,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '11m 05s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    hcpId: 'HCP-002',
+    hcpName: 'Dr. Michael Chen',
+    source: 'Cardiovexra Webinar Email',
     flowContent: `👤 User\n\nHow should I dose Cardiovexra in patients with hepatic impairment?\n\n🤖 Info Agent\n\nFor mild hepatic impairment (Child-Pugh A), no dose adjustment needed. For moderate impairment (Child-Pugh B), reduce dose to 2.5mg daily. Cardiovexra is not recommended in severe hepatic impairment.\n\nDocuments Shared:\n- Hepatic Impairment Dosing Guidelines\n- Clinical Pharmacology Data`,
     jsonData: {
       "conversation_id": "CONV-006",
@@ -607,6 +626,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '8m 41s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-003',
+    hcpName: 'Dr. Emily Rodriguez',
+    source: 'Oncomyra Now Approved Campaign Email',
     flowContent: `👤 User\n\nCan Oncomyra be used with other cancer therapies?\n\n🤖 Info Agent\n\nOncomyra is typically used as monotherapy in second-line or later treatment. Combination with other anticancer agents has not been extensively studied. Consult the prescribing information for drug interaction data.\n\nDocuments Shared:\n- Oncomyra Drug Interactions\n- Clinical Trial Design Summary`,
     jsonData: {
       "conversation_id": "CONV-007",
@@ -625,6 +647,7 @@ Ticket ID: CAR-2024-1211`,
     duration: '13m 18s',
     url: 'agent.pharma.com/portfolio',
     focus: 'Mixed Portfolio',
+    source: 'Cardiovexra Doc Locator Email',
     flowContent: `👤 User\n\nWhat is the mechanism of action for Cardiovexra?\n\n🤖 Info Agent\n\nCardiovexra is a selective endothelin receptor antagonist that blocks both ETA and ETB receptors, reducing vasoconstriction and promoting vasodilation to lower blood pressure.\n\nDocuments Shared:\n- Cardiovexra Mechanism of Action Overview\n- Pharmacodynamics Summary`,
     jsonData: {
       "conversation_id": "CONV-008",
@@ -643,6 +666,7 @@ Ticket ID: CAR-2024-1211`,
     duration: '15m 27s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    source: 'Oncomyra Welcome Email',
     flowContent: `👤 User\n\nWhat monitoring is required for patients on Cardiovexra?\n\n🤖 Info Agent\n\nRegular monitoring includes blood pressure checks, liver function tests monthly for the first 3 months then quarterly, and assessment for signs of fluid retention. Monitor hemoglobin levels in patients at risk for anemia.\n\nDocuments Shared:\n- Cardiovexra Monitoring Protocol\n- Laboratory Test Guidelines`,
     jsonData: {
       "conversation_id": "CONV-009",
@@ -661,6 +685,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '10m 08s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-004',
+    hcpName: 'Dr. James Wilson',
+    source: 'Cardiovexra Webinar Email',
     flowContent: `👤 User\n\nHow is FGFR2 fusion status determined?\n\n🤖 Info Agent\n\nFGFR2 fusion or rearrangement status should be determined using an FDA-approved companion diagnostic test. Next-generation sequencing (NGS) of tumor tissue is the preferred method.\n\nDocuments Shared:\n- FGFR2 Testing Guidelines\n- Companion Diagnostic Information`,
     jsonData: {
       "conversation_id": "CONV-010",
@@ -679,6 +706,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '12m 44s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    hcpId: 'HCP-001',
+    hcpName: 'Dr. Sarah Johnson',
+    source: 'Oncomyra Doc Locator Email',
     flowContent: `👤 User\n\nCan Cardiovexra be used in pregnancy?\n\n🤖 Info Agent\n\nCardiovexra is contraindicated in pregnancy due to potential fetal harm. Women of childbearing potential should use effective contraception during treatment and for one month after discontinuation.\n\nDocuments Shared:\n- Cardiovexra Pregnancy and Lactation Information\n- Contraception Guidance`,
     jsonData: {
       "conversation_id": "CONV-011",
@@ -697,6 +727,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '9m 55s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-005',
+    hcpName: 'Dr. Lisa Martinez',
+    source: 'Oncomyra Welcome Email',
     flowContent: `👤 User\n\nWhat should patients do if they miss an Oncomyra dose?\n\n🤖 Info Agent\n\nIf a dose is missed, patients should take it as soon as remembered on the same day. If more than 12 hours late, skip the missed dose and resume the regular schedule. Do not double dose.\n\nDocuments Shared:\n- Oncomyra Patient Administration Guide\n- Dosing Instructions`,
     jsonData: {
       "conversation_id": "CONV-012",
@@ -715,6 +748,7 @@ Ticket ID: CAR-2024-1211`,
     duration: '17m 11s',
     url: 'agent.pharma.com/portfolio',
     focus: 'Mixed Portfolio',
+    source: 'Cardiovexra Welcome Email',
     flowContent: `👤 User\n\nAre there any food interactions with Cardiovexra?\n\n🤖 Info Agent\n\nCardiovexra can be taken with or without food. However, consistent administration with regards to meals is recommended to maintain stable drug levels.\n\nDocuments Shared:\n- Cardiovexra Administration Guidelines\n- Food Interaction Data`,
     jsonData: {
       "conversation_id": "CONV-013",
@@ -733,6 +767,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '11m 22s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-004',
+    hcpName: 'Dr. James Wilson',
+    source: 'Oncomyra Now Approved Campaign Email',
     flowContent: `👤 User\n\nWhat is the recommended dose of Oncomyra?\n\n🤖 Info Agent\n\nThe recommended dose is 16 mg orally once daily until disease progression or unacceptable toxicity. Take on an empty stomach, at least 1 hour before or 2 hours after a meal.\n\nDocuments Shared:\n- Oncomyra Dosing and Administration\n- Prescribing Information (Section 2)`,
     jsonData: {
       "conversation_id": "CONV-014",
@@ -751,6 +788,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '13m 50s',
     url: 'agent.pharma.com/cardiovexra',
     focus: 'Cardiovexra Focus',
+    hcpId: 'HCP-002',
+    hcpName: 'Dr. Michael Chen',
+    source: 'Cardiovexra Doc Locator Email',
     flowContent: `👤 User\n\nHow quickly does Cardiovexra lower blood pressure?\n\n🤖 Info Agent\n\nBlood pressure reduction with Cardiovexra is typically observed within 2-4 weeks of treatment initiation. Maximum effects are usually seen at 8-12 weeks of therapy.\n\nDocuments Shared:\n- Cardiovexra Pharmacodynamics\n- Time to Effect Analysis`,
     jsonData: {
       "conversation_id": "CONV-015",
@@ -769,6 +809,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '12m 33s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    hcpId: 'HCP-005',
+    hcpName: 'Dr. Lisa Martinez',
+    source: 'Cardiovexra Webinar Email',
     flowContent: `👤 User\n\nWhat are the phosphate management strategies for Oncomyra?\n\n🤖 Info Agent\n\nHyperphosphatemia management includes phosphate binders, dietary phosphate restriction, and dose modifications if levels remain elevated despite interventions. Monitor serum phosphate every 2 weeks for first 3 months.\n\nDocuments Shared:\n- Hyperphosphatemia Management Protocol\n- Oncomyra Dose Modification Guidelines`,
     jsonData: {
       "conversation_id": "CONV-016",
@@ -787,6 +830,9 @@ Ticket ID: CAR-2024-1211`,
     duration: '15m 19s',
     url: 'agent.pharma.com/portfolio',
     focus: 'Mixed Portfolio',
+    hcpId: 'HCP-003',
+    hcpName: 'Dr. Emily Rodriguez',
+    source: 'Cardiovexra Welcome Email',
     flowContent: `👤 User\n\nCan Cardiovexra be combined with ACE inhibitors?\n\n🤖 Info Agent\n\nYes, Cardiovexra can be used in combination with ACE inhibitors or ARBs. However, monitor blood pressure carefully to avoid excessive hypotension, especially during treatment initiation.\n\nDocuments Shared:\n- Cardiovexra Drug Combination Studies\n- Antihypertensive Combination Therapy Guide`,
     jsonData: {
       "conversation_id": "CONV-017",
@@ -805,6 +851,7 @@ Ticket ID: CAR-2024-1211`,
     duration: '10m 47s',
     url: 'agent.pharma.com/oncomyra',
     focus: 'Oncomyra Focus',
+    source: 'Oncomyra Doc Locator Email',
     flowContent: `👤 User\n\nWhat are the storage requirements for Oncomyra?\n\n🤖 Info Agent\n\nStore Oncomyra at room temperature (20-25°C or 68-77°F). Keep in original container to protect from moisture. Do not remove desiccant. Keep out of reach of children.\n\nDocuments Shared:\n- Oncomyra Storage and Handling\n- Patient Information Leaflet`,
     jsonData: {
       "conversation_id": "CONV-018",
@@ -828,16 +875,60 @@ export default function ConversationLog() {
     }
   }
 
+  // Group conversations by HCP
+  const groupedConversations = conversations.reduce((acc, conv) => {
+    const key = conv.hcpId || conv.hcpName || 'unidentified'
+    if (!acc[key]) {
+      acc[key] = []
+    }
+    acc[key].push(conv)
+    return acc
+  }, {} as Record<string, Conversation[]>)
+
   return (
-    <div className="space-y-3">
-      {conversations.map((conversation) => (
-        <Card key={conversation.id} className="border-border hover:shadow-md transition-shadow">
+    <div className="space-y-4">
+      {Object.entries(groupedConversations).map(([hcpKey, hcpConversations]) => {
+        const isStacked = hcpConversations.length > 1
+        
+        return (
+          <div key={hcpKey} className="relative">
+            {/* Stacked card effect */}
+            {isStacked && (
+              <>
+                <div className="absolute top-1 left-2 right-2 h-full bg-gray-100 border border-gray-200 rounded-lg -z-10" />
+                <div className="absolute top-2 left-4 right-4 h-full bg-gray-50 border border-gray-100 rounded-lg -z-20" />
+              </>
+            )}
+            
+            {/* Render each conversation in the group */}
+            <div className="space-y-3">
+              {hcpConversations.map((conversation, index) => (
+        <Card key={conversation.id} className="border-border hover:shadow-md transition-shadow relative z-0">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0 space-y-2">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">
                     {conversation.focus}
+                  </span>
+                  
+                  {/* HCP ID Tag */}
+                  {conversation.hcpId && conversation.hcpName ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                      <User className="w-3 h-3" />
+                      {conversation.hcpId} - {conversation.hcpName}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                      <User className="w-3 h-3" />
+                      Unidentified
+                    </span>
+                  )}
+                  
+                  {/* Source Tag */}
+                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-teal-100 text-teal-800 px-2 py-1 rounded">
+                    <Mail className="w-3 h-3" />
+                    {conversation.source}
                   </span>
                 </div>
 
@@ -886,6 +977,10 @@ export default function ConversationLog() {
           </CardContent>
         </Card>
       ))}
+            </div>
+          </div>
+        )
+      })}
 
       <Dialog open={!!selectedConversation} onOpenChange={() => setSelectedConversation(null)}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
