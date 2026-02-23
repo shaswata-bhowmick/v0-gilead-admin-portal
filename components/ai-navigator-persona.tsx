@@ -10,10 +10,48 @@ import { Button } from '@/components/ui/button'
 import { Bot, Save, Volume2, UserCircle } from 'lucide-react'
 
 const VOICE_OPTIONS = [
-  { id: 'voice-1', name: 'Professional', description: 'Clear and authoritative' },
-  { id: 'voice-2', name: 'Friendly', description: 'Warm and approachable' },
-  { id: 'voice-3', name: 'Conversational', description: 'Casual and relaxed' },
-  { id: 'voice-4', name: 'Empathetic', description: 'Caring and understanding' },
+  { 
+    id: 'voice-1', 
+    name: 'James', 
+    gender: 'Male',
+    accent: 'US Accent',
+    description: 'Professional and authoritative tone, ideal for medical information' 
+  },
+  { 
+    id: 'voice-2', 
+    name: 'Michael', 
+    gender: 'Male',
+    accent: 'US Accent',
+    description: 'Warm and approachable, perfect for patient-friendly communication' 
+  },
+  { 
+    id: 'voice-3', 
+    name: 'David', 
+    gender: 'Male',
+    accent: 'US Accent',
+    description: 'Clear and conversational, great for educational content' 
+  },
+  { 
+    id: 'voice-4', 
+    name: 'Sarah', 
+    gender: 'Female',
+    accent: 'US Accent',
+    description: 'Caring and empathetic, excellent for sensitive topics' 
+  },
+  { 
+    id: 'voice-5', 
+    name: 'Emily', 
+    gender: 'Female',
+    accent: 'US Accent',
+    description: 'Confident and articulate, suited for clinical discussions' 
+  },
+  { 
+    id: 'voice-6', 
+    name: 'Jennifer', 
+    gender: 'Female',
+    accent: 'US Accent',
+    description: 'Friendly and reassuring, ideal for patient support' 
+  },
 ]
 
 const AVATAR_OPTIONS = [
@@ -24,12 +62,12 @@ const AVATAR_OPTIONS = [
 ]
 
 export default function AINavigatorPersona() {
-  const [personaName, setPersonaName] = useState('Medical AI Assistant')
+  const [personaName, setPersonaName] = useState('ProOne')
   const [personaDescription, setPersonaDescription] = useState(
-    'A knowledgeable medical information assistant specialized in pharmaceutical products and clinical data.'
+    'PharmaOne\'s Medical Information Assistant'
   )
   const [greetingMessage, setGreetingMessage] = useState(
-    'Hello! I\'m here to help you find accurate information about our pharmaceutical products. How can I assist you today?'
+    'Hi, I\'m ProOne, PharmaOne\'s Medical Information Assistant. I can provide you with concise answers about PharmaOne medicines. If your question does not relate to a PharmaOne medicine, please close the chat and use the search bar to ask your question.'
   )
   const [selectedVoice, setSelectedVoice] = useState('voice-1')
   const [selectedAvatar, setSelectedAvatar] = useState('avatar-1')
@@ -46,14 +84,14 @@ export default function AINavigatorPersona() {
     alert('Persona settings saved successfully!')
   }
 
+  const handlePlayVoice = (voiceId: string) => {
+    // Placeholder for voice playback
+    console.log('[v0] Playing voice preview:', voiceId)
+    alert(`Playing voice preview for ${VOICE_OPTIONS.find(v => v.id === voiceId)?.name}`)
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">AI Navigator Persona</h2>
-        <p className="text-muted-foreground mt-2">
-          Configure the personality and appearance of your AI Navigator
-        </p>
-      </div>
 
       <div className="grid gap-6">
         {/* Basic Information */}
@@ -116,20 +154,41 @@ export default function AINavigatorPersona() {
             <CardDescription>Choose the communication style for your AI Navigator</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {VOICE_OPTIONS.map((voice) => (
-                <button
+                <div
                   key={voice.id}
-                  onClick={() => setSelectedVoice(voice.id)}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all ${
                     selectedVoice === voice.id
                       ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
+                      : 'border-border'
                   }`}
                 >
-                  <div className="font-semibold">{voice.name}</div>
-                  <div className="text-sm text-muted-foreground mt-1">{voice.description}</div>
-                </button>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="font-semibold text-base">{voice.name}</div>
+                      <div className="text-xs text-muted-foreground">{voice.gender} • {voice.accent}</div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePlayVoice(voice.id)}
+                      className="h-8 w-8 p-0"
+                      title="Listen to voice preview"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">{voice.description}</p>
+                  <Button
+                    variant={selectedVoice === voice.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedVoice(voice.id)}
+                    className="w-full"
+                  >
+                    {selectedVoice === voice.id ? 'Selected' : 'Select Voice'}
+                  </Button>
+                </div>
               ))}
             </div>
           </CardContent>
