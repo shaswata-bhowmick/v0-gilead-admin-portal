@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Check, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -44,10 +44,16 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
   const [region, setRegion] = useState('US')
   const [drugCategories, setDrugCategories] = useState<string[]>(DEFAULT_DRUG_CATEGORIES)
   const [loading, setLoading] = useState(false)
+  const [approvalStage, setApprovalStage] = useState(0)
+  const [showApprovalFlow, setShowApprovalFlow] = useState(false)
 
   // Generate auto-ID when modal opens or load existing data in edit mode
   useEffect(() => {
     if (open) {
+      // Reset approval flow
+      setShowApprovalFlow(false)
+      setApprovalStage(0)
+      
       if (isEditMode && editingFaq) {
         // Load existing data for editing
         setNewId(editingFaq.id || '')
@@ -112,6 +118,17 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
 
     try {
       setLoading(true)
+      setShowApprovalFlow(true)
+      setApprovalStage(1)
+
+      // Animate through approval stages (5 seconds each)
+      const stages = [1, 2, 3, 4]
+      for (const stage of stages) {
+        setApprovalStage(stage)
+        await new Promise(resolve => setTimeout(resolve, 5000))
+      }
+
+      // Only call API after all 4 stages complete
       const today = new Date('2026-02-27')
       const formattedDate = today.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -128,6 +145,7 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
         region,
         version: isEditMode ? editingFaq.version : 'v1',
         created_date: isEditMode ? editingFaq.created_date : formattedDate,
+        status: 'Approved',
       })
 
       // Reset form
@@ -138,8 +156,12 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
       setShowCustomCategory(false)
       setAudience('HCP')
       setRegion('US')
+      setShowApprovalFlow(false)
+      setApprovalStage(0)
     } catch (error) {
       console.error('[v0] Error in AddFAQModal:', error)
+      setShowApprovalFlow(false)
+      setApprovalStage(0)
     } finally {
       setLoading(false)
     }
@@ -317,6 +339,56 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
           </div>
         </div>
 
+        {/* Approval Flow Animation */}
+        {showApprovalFlow && (
+          <div className="border border-border rounded-lg p-4 bg-muted/30">
+            <h4 className="font-semibold text-sm mb-3">Approval Process</h4>
+            <div className="space-y-3">
+              {[
+                { id: 1, label: 'In Review', color: 'blue' },
+                { id: 2, label: 'Feedback Incorporation', color: 'yellow' },
+                { id: 3, label: 'In Approval', color: 'orange' },
+                { id: 4, label: 'Approved for Use', color: 'green' },
+              ].map((stage) => (
+                <div
+                  key={stage.id}
+                  className={`flex items-center gap-3 p-3 rounded-md transition-all ${
+                    approvalStage === stage.id
+                      ? 'bg-primary/10 border-2 border-primary'
+                      : approvalStage > stage.id
+                      ? 'bg-green-50 border-2 border-green-500'
+                      : 'bg-background border border-border opacity-50'
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      approvalStage === stage.id
+                        ? 'bg-primary text-primary-foreground'
+                        : approvalStage > stage.id
+                        ? 'bg-green-500 text-white'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {approvalStage === stage.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : approvalStage > stage.id ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <span className="text-xs font-semibold">{stage.id}</span>
+                    )}
+                  </div>
+                  <span className={`text-sm font-medium ${approvalStage >= stage.id ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {stage.label}
+                  </span>
+                  {approvalStage === stage.id && stage.id === 4 && (
+                    <Check className="w-5 h-5 text-green-600 ml-auto" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <DialogFooter>
           <Button
             variant="outline"
@@ -328,7 +400,7 @@ export function AddFAQModal({ open, onOpenChange, onSubmit, lastFaqId, editingFa
           <Button onClick={handleSubmit} disabled={loading}>
             {isEditMode
               ? loading ? 'Updating...' : 'Update FAQ'
-              : loading ? 'Adding...' : 'Add FAQ'}
+              : loading ? 'Processing...' : 'Submit for Approval'}
           </Button>
         </DialogFooter>
       </DialogContent>

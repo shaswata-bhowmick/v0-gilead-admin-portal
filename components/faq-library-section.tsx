@@ -20,6 +20,7 @@ interface FAQ {
   created_date?: string
   created_by?: string
   tags?: string[]
+  status?: 'Approved' | 'In Review' | 'Draft'
 }
 
 const FAQS_PER_PAGE = 5
@@ -40,6 +41,7 @@ export function FAQLibrarySection() {
   const [selectedDrugType, setSelectedDrugType] = useState<string>('all')
   const [selectedAudience, setSelectedAudience] = useState<string>('all')
   const [selectedRegion, setSelectedRegion] = useState<string>('all')
+  const [selectedStatus, setSelectedStatus] = useState<string>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [expandedAnswers, setExpandedAnswers] = useState<Set<string>>(new Set())
@@ -61,7 +63,14 @@ export function FAQLibrarySection() {
 
       const data = await response.json()
       console.log('[v0] Received', data.count, 'FAQs:', data.faqs?.length || 0)
-      setFaqs(data.faqs || [])
+      
+      // Auto-assign statuses: 35 Approved, 6 In Review, rest Draft
+      const faqsWithStatus = (data.faqs || []).map((faq: FAQ, index: number) => ({
+        ...faq,
+        status: index < 35 ? 'Approved' : index < 41 ? 'In Review' : 'Draft'
+      }))
+      
+      setFaqs(faqsWithStatus)
       setCurrentPage(1)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
@@ -181,6 +190,11 @@ export function FAQLibrarySection() {
       filtered = filtered.filter(faq => faq.region === selectedRegion)
     }
 
+    // Filter by status
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(faq => faq.status === selectedStatus)
+    }
+
     // Sort by date
     filtered.sort((a, b) => {
       const dateA = a.created_date ? new Date(a.created_date).getTime() : 0
@@ -189,7 +203,7 @@ export function FAQLibrarySection() {
     })
 
     return filtered
-  }, [faqs, searchQuery, selectedDrugType, selectedAudience, selectedRegion, sortOrder])
+  }, [faqs, searchQuery, selectedDrugType, selectedAudience, selectedRegion, selectedStatus, sortOrder])
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFaqs.length / FAQS_PER_PAGE)
@@ -200,7 +214,7 @@ export function FAQLibrarySection() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedDrugType, selectedAudience, selectedRegion, sortOrder])
+  }, [searchQuery, selectedDrugType, selectedAudience, selectedRegion, selectedStatus, sortOrder])
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
@@ -224,10 +238,11 @@ export function FAQLibrarySection() {
     setSelectedDrugType('all')
     setSelectedAudience('all')
     setSelectedRegion('all')
+    setSelectedStatus('all')
     setSortOrder('newest')
   }
 
-  const hasActiveFilters = searchQuery || selectedDrugType !== 'all' || selectedAudience !== 'all' || selectedRegion !== 'all'
+  const hasActiveFilters = searchQuery || selectedDrugType !== 'all' || selectedAudience !== 'all' || selectedRegion !== 'all' || selectedStatus !== 'all'
 
   // Group filtered FAQs by drug category
   const groupedFaqs = useMemo(() => {
@@ -302,7 +317,7 @@ export function FAQLibrarySection() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
               {/* Search by Question */}
               <div className="lg:col-span-2">
                 <div className="relative">
@@ -357,6 +372,21 @@ export function FAQLibrarySection() {
                     {regions.filter(r => r !== 'all').map((reg) => (
                       <SelectItem key={reg} value={reg}>{reg}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Status Filter */}
+              <div>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="Approved">Approved</SelectItem>
+                    <SelectItem value="In Review">In Review</SelectItem>
+                    <SelectItem value="Draft">Draft</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -421,7 +451,20 @@ export function FAQLibrarySection() {
                   <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
                     <Globe className="w-3 h-3" />
                     {selectedRegion}
-                    <button onClick={() => setSelectedAudience('all')} className="ml-1 hover:opacity-70">
+                    <button onClick={() => setSelectedRegion('all')} className="ml-1 hover:opacity-70">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                {selectedStatus !== 'all' && (
+                  <div className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${
+                    selectedStatus === 'Approved' ? 'bg-green-100 text-green-700' :
+                    selectedStatus === 'In Review' ? 'bg-orange-100 text-orange-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    <Tag className="w-3 h-3" />
+                    {selectedStatus}
+                    <button onClick={() => setSelectedStatus('all')} className="ml-1 hover:opacity-70">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -525,6 +568,16 @@ export function FAQLibrarySection() {
 
                             {/* Metadata */}
                             <div className="flex flex-wrap gap-2 pt-1">
+                              {faq.status && (
+                                <div className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full font-medium ${
+                                  faq.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                                  faq.status === 'In Review' ? 'bg-orange-100 text-orange-700' :
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  <Tag className="w-3 h-3" />
+                                  {faq.status}
+                                </div>
+                              )}
                               {faq.audience && (
                                 <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
                                   <Users className="w-3 h-3" />
