@@ -247,7 +247,7 @@ export function DocumentLibrarySection() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      <span>{doc.uploaded_date ? new Date(doc.uploaded_date + 'T00:00:00').toLocaleDateString('en-US') : 'N/A'}</span>
+                      <span>{doc.uploaded_date ? new Date(doc.uploaded_date).toLocaleDateString() : 'N/A'}</span>
                     </div>
                   </div>
                 </CardContent>

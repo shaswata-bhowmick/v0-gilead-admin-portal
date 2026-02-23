@@ -545,7 +545,7 @@ export function FAQLibrarySection() {
                               {faq.created_date && (
                                 <div className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
                                   <Calendar className="w-3 h-3" />
-                                  {new Date(faq.created_date + 'T00:00:00').toLocaleDateString('en-US')}
+                                  {new Date(faq.created_date).toLocaleDateString()}
                                 </div>
                               )}
                             </div>
