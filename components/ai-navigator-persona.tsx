@@ -101,7 +101,6 @@ export default function AINavigatorPersona() {
               <Bot className="w-5 h-5" />
               Basic Information
             </CardTitle>
-            <CardDescription>Define the core identity of your AI Navigator</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -151,7 +150,6 @@ export default function AINavigatorPersona() {
               <Volume2 className="w-5 h-5" />
               Voice & Tone
             </CardTitle>
-            <CardDescription>Choose the communication style for your AI Navigator</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -169,16 +167,16 @@ export default function AINavigatorPersona() {
                       <div className="font-semibold text-base">{voice.name}</div>
                       <div className="text-xs text-muted-foreground">{voice.gender} • {voice.accent}</div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handlePlayVoice(voice.id)}
-                      className="h-8 w-8 p-0"
-                      title="Listen to voice preview"
-                    >
-                      <Volume2 className="w-4 h-4" />
-                    </Button>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePlayVoice(voice.id)}
+                    className="w-full mb-3 gap-2"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    Listen
+                  </Button>
                   <p className="text-sm text-muted-foreground mb-3">{voice.description}</p>
                   <Button
                     variant={selectedVoice === voice.id ? 'default' : 'outline'}

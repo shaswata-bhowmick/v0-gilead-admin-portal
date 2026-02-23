@@ -10,7 +10,8 @@ export default function Header({ currentSection }: HeaderProps) {
   const sectionTitles: Record<string, string> = {
     faq: 'FAQ & Content',
     workflow: 'Workflows',
-    navigator: 'AI Navigator Persona',
+    navigator: 'AI Navigator',
+    persona: 'AI Navigator Persona',
     users: 'User & Role Management',
     integrations: 'Platform Integrations',
     audit: 'Global Audit Logs',
