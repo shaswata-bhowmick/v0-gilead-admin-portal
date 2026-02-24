@@ -265,7 +265,7 @@ export default function Reporting() {
                   <div className="flex-1">
                     <p className="text-sm text-foreground">{feedback.text}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(feedback.date).toLocaleDateString()}
+                      {new Date(feedback.date).toLocaleDateString('en-US')}
                     </p>
                   </div>
                 </div>
